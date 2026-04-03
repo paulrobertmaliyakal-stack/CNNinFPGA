@@ -93,8 +93,10 @@ linebuffer2[0]<=linebuffer3[rowlength+2*padding-1];
 //deciding the pixel to dump into the line buffer
 if(force_execute==1 && done==1) begin  
 linebuffer3[0]<=0;
-if(index3==rowlength+2*padding-1) begin
+index1<=index1+1;
+if(index1==2*(rowlength+2*padding)+1) begin
 finish<=1;
+en_out<=0;
 end
 end
 

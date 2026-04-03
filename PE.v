@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module PE(input clk,input [7:0] data_1,input [7:0] data_2,input [7:0] data_3,input en_in,output reg [31:0] out);
+module PE(input clk,input [7:0] data_1,input [7:0] data_2,input [7:0] data_3,input en_in,output reg [31:0] out,output reg en_out);
 reg [7:0] kernel[8:0];
 parameter kernelsum=10;
 parameter rowlength=6;
@@ -56,14 +56,17 @@ accum1<=data_1*kernel[0]+data_2*kernel[3]+data_3*kernel[6];
 case (accum_num)
 2'b01:begin
 out<=accum1;
+en_out<=1;
 rowcount<=rowcount+1;
 end
 2'b10: begin
 out<=accum2;
+en_out<=1;
 rowcount<=rowcount+1;
 end
 2'b11: begin
 out<=accum3;
+en_out<=1;
 rowcount<=rowcount+1;
 end
 endcase
@@ -86,6 +89,7 @@ accum1<=data_1*kernel[0]+data_2*kernel[3]+data_3*kernel[6];
 accum2<=accum2+data_1*kernel[2]+data_2*kernel[5]+data_3*kernel[8];
 accum3<=accum3+data_1*kernel[1]+data_2*kernel[4]+data_3*kernel[7];
 out<=accum1;
+en_out<=1;
 rowcount<=rowcount+1;
 if((rowcount==rowlength-2 && accum_num==0)|| rowcount==rowlength-1) begin
 state<=3'b000;
@@ -102,6 +106,7 @@ accum1<=accum1+data_1*kernel[1]+data_2*kernel[4]+data_3*kernel[7];
 accum2<=data_1*kernel[0]+data_2*kernel[3]+data_3*kernel[6];
 accum3<=accum3+data_1*kernel[2]+data_2*kernel[5]+data_3*kernel[8];
 out<=accum2;
+en_out<=1;
 rowcount<=rowcount+1;
 if((rowcount==rowlength-2 && accum_num==0)|| rowcount==rowlength-1) begin
 state<=3'b000;
@@ -118,6 +123,7 @@ accum1<=accum1+data_1*kernel[2]+data_2*kernel[5]+data_3*kernel[8];
 accum2<=accum2+data_1*kernel[1]+data_2*kernel[4]+data_3*kernel[7];
 accum3<=data_1*kernel[0]+data_2*kernel[3]+data_3*kernel[6];
 out<=accum3;
+en_out<=1;
 rowcount<=rowcount+1;
 if((rowcount==rowlength-2 && accum_num==0)|| rowcount==rowlength-1) begin
 state<=3'b0;
@@ -130,6 +136,12 @@ state<=3'b001;
 end
 end
 endcase
+end
+end
+
+always @(posedge clk) begin
+if(en_out==1) begin
+en_out<=0;
 end
 end
 endmodule
