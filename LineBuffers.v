@@ -91,7 +91,8 @@ linebuffer1[0]<=linebuffer2[rowlength+2*padding-1];
 linebuffer2[0]<=linebuffer3[rowlength+2*padding-1];
 
 //deciding the pixel to dump into the line buffer
-if(force_execute==1 && done==1) begin  
+if(force_execute==1 && done==1) begin
+state<=2'b11;
 linebuffer3[0]<=0;
 index1<=index1+1;
 if(index1==2*(rowlength+2*padding)+1) begin
@@ -127,6 +128,10 @@ index3<=index3+1;
 end
 //---------------
 end
+
+2'b11:begin  //just a delay state
+state<=2'b10;
+end
 endcase
 end
 end
@@ -148,7 +153,7 @@ end
 end
 
 always @(posedge clk) begin
-if(en_out==1 && force_execute==0) begin
+if((en_out==1 && force_execute==0)||state==3) begin
 en_out<=0;
 end
 end
