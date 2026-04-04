@@ -29,54 +29,63 @@ reg [pixel_width-1:0] temp;
 reg [pixel_width-1:0] temp2;
 integer i;
 integer index;
+integer count;
 initial begin
+count=0;
 state=0;
 index=0;
 end
 always@(posedge clk) begin
-if(en_in==1) begin
-case(state) 
+if(en_in==1 || count==(rowlength/2)*(rowlength/2)-1) begin
+case (state)
+
 3'b000:begin
 temp<=data;
-if(index==(rowlength/2)-1) begin
-state<=1; 
-index<=index+1;
-end
-else if(index==rowlength/2) begin
-state<=2;
-end
-else begin
 state<=1;
 end
-end
-3'b001:begin
-row1[0]<=data>temp?data:temp;
+
+3'b001: begin
+row1[0]<=(data>temp)?data:temp;
 if(index==(rowlength/2)-1) begin
-state<=0;
+state<=2;
+index<=0;
 end
 else begin
-index<=(index==rowlength/2)?index:index+1;
-state<=0;
+state<=0;  
+index<=index+1;
 end
-end
-3'b010: begin
-state<=3;
-temp2<=data>temp?data:temp;
-end
-3'b011: begin
-temp<=data;
-data_out<=row1[(rowlength/2)-1]>temp2?row1[(rowlength/2)-1]:temp2;
-state<=2;
-row1[0]<=temp2;
 end
 
+3'b010:begin
+temp<=data;
+state<=3;
+end
+
+3'b011:begin
+temp2<=(temp>data)?temp:data;
+state<=4;
+end
+
+3'b100:begin
+temp<=data;
+data_out<=(temp2>row1[(rowlength/2)-1])?temp2:row1[(rowlength/2)-1];
+count<=count+1;
+state<=3;
+if(index==(rowlength/2)-1) begin
+index<=0;
+state<=1;
+end
+else begin
+index<=index+1;
+end
+end
 endcase
 end
 end
 
 always @(posedge clk) begin
 if(en_in==1) begin
-if(state==1 || state==3) begin
+if(state==1 || state==4) begin
 for(i=1;i<(rowlength/2);i=i+1) begin
 row1[i]<=row1[i-1];
 end
