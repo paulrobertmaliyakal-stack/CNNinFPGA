@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module MaxPooling(input clk,input [31:0] data,input en_in,output en_out,output reg [31:0] data_out);
+module MaxPooling(input clk,input [31:0] data,input en_in,output reg  en_out,output reg [31:0] data_out);
 parameter rowlength=6;
 parameter pixel_width=32;
 reg [2:0] state;
@@ -69,6 +69,7 @@ end
 3'b100:begin
 temp<=data;
 data_out<=(temp2>row1[(rowlength/2)-1])?temp2:row1[(rowlength/2)-1];
+en_out<=1;
 count<=count+1;
 state<=3;
 if(index==(rowlength/2)-1) begin
@@ -90,6 +91,12 @@ for(i=1;i<(rowlength/2);i=i+1) begin
 row1[i]<=row1[i-1];
 end
 end
+end
+end
+
+always @(posedge clk) begin
+if(en_out==1) begin
+en_out<=0;  
 end
 end
 
